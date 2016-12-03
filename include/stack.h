@@ -100,6 +100,4 @@ auto stack<T>::operator == (const stack<T>& rhs) -> bool
     return true;
 }
 
-
-
 #endif //STACK_STACK_H
