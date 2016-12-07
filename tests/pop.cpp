@@ -5,20 +5,6 @@
 #include <stack.h>
 #include "catch.h"
 
-SCENARIO("if stack is empty => throw an exception")
-{
-    GIVEN("empty stack")
-    {
-        stack<size_t> st;
-        WHEN("try to pop an element")
-        {
-            THEN("throw an exception")
-            {
-                REQUIRE_THROWS(st.pop());
-            }
-        }
-    }
-}
 SCENARIO("if stack is empty => length must stay constant")
 {
     GIVEN("empty stack")
@@ -26,6 +12,7 @@ SCENARIO("if stack is empty => length must stay constant")
         stack<size_t> st;
         WHEN("try to pop an element")
         {
+            st.pop();
             THEN("length must be 0")
             {
                 REQUIRE(st.length() == 0);
