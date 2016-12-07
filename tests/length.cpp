@@ -2,8 +2,8 @@
 // Created by anna on 03.12.16.
 //
 
-#include <stack.h>
-#include "catch.h"
+#include <stack.hpp>
+#include "catch.hpp"
 
 SCENARIO("if stack is empty => return 0")
 {
