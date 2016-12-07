@@ -24,11 +24,12 @@ public:
     auto length() const noexcept -> size_t;
     auto push_back(const T&) -> void;
     auto pop() -> T;
+    auto operator = (const stack&) -> stack&;
     auto operator == (const stack&) -> bool;
 
     friend auto operator << (std::ostream& out, const stack<T>& st) -> std::ostream&
     {
-        for(size_t i = 0; i < st.count + 1; ++i)
+        for(size_t i = 0; i < st.count; ++i)
             out << st.array[i] << " ";
         out << "\n";
         return out;
@@ -84,6 +85,20 @@ template <typename T>
 stack<T>::~stack()
 {
     delete [] array;
+}
+
+template <typename T>
+auto stack<T>::operator = (const stack& rhs) -> stack&
+{
+    if(this == &rhs)
+        return *this;
+
+    count = rhs.count;
+    arr_size = rhs.arr_size;
+    delete [] array;
+    array = new T[arr_size];
+    std::memcpy(array, rhs.array, sizeof(T) * count);
+    return *this;
 }
 
 template <typename T>

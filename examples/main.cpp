@@ -12,5 +12,19 @@ int main()
     st.push_back(6);
     st.push_back(7);
     std::cout << st;
+
+    stack<int> s1;
+    s1.push_back(1);
+    s1.push_back(10);
+    std::cout << s1;
+    stack<int> s2;
+    s2.push_back(1);
+    s2.push_back(3);
+    std::cout << s2;
+    if(s1 == s2)
+        std::cout << "equeak" << std::endl;
+    s1 = s2;
+    std::cout << s1;
+    std::cout << s2;
     std::cout << "\nok" << std::endl;
 }
