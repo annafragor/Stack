@@ -56,7 +56,7 @@ auto stack<T>::push_back(const T& data) -> void
     {
         arr_size += 5;
         T* longer_array = new T[arr_size];
-        memcpy(longer_array, array, sizeof(T) * count);
+        std::memcpy(longer_array, array, sizeof(T) * count);
         delete [] array;
         array = longer_array;
         longer_array = nullptr;
