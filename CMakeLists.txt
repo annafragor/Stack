@@ -13,12 +13,12 @@ add_executable(Examples ${CMAKE_CURRENT_SOURCE_DIR} examples/main.cpp)
 
 add_executable(length ${CMAKE_CURRENT_SOURCE_DIR}/tests/length.cpp)
 target_link_libraries(length ${PROJECT_NAME} ${DEPENDS_LIBRARIES})
-add_test(NAME length COMMAND length "-s" "-r" "compact" "--use-colour" "yes")
 
 add_executable(pop ${CMAKE_CURRENT_SOURCE_DIR}/tests/pop.cpp)
 target_link_libraries(pop ${PROJECT_NAME} ${DEPENDS_LIBRARIES})
-add_test(NAME pop COMMAND pop "-s" "-r" "compact" "--use-colour" "yes")
 
 add_executable(push_back ${CMAKE_CURRENT_SOURCE_DIR}/tests/push_back.cpp)
 target_link_libraries(push_back ${PROJECT_NAME} ${DEPENDS_LIBRARIES})
-add_test(NAME push_back COMMAND push_back "-s" "-r" "compact" "--use-colour" "yes")
+
+add_executable(empty ${CMAKE_CURRENT_SOURCE_DIR}/tests/empty.cpp)
+target_link_libraries(empty ${PROJECT_NAME} ${DEPENDS_LIBRARIES})

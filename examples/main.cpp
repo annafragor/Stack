@@ -21,10 +21,7 @@ int main()
     s2.push_back(1);
     s2.push_back(3);
     std::cout << s2;
-    if(s1 == s2)
-        std::cout << "equeak" << std::endl;
-    s1 = s2;
-    std::cout << s1;
-    std::cout << s2;
+    if(!(s1 == s2))
+        std::cout << "non equal" << std::endl;
     std::cout << "\nok" << std::endl;
 }

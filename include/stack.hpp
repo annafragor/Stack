@@ -21,9 +21,12 @@ public:
 
     stack();
     ~stack();
+    auto pop() noexcept -> void;
+    auto top() const noexcept -> T*;
+    auto empty() const noexcept -> bool;
     auto length() const noexcept -> size_t;
-    auto push_back(const T&) -> void;
-    auto pop() -> T;
+    auto push_back(const T&) noexcept -> void;
+
     auto operator == (const stack&) -> bool;
 
     friend auto operator << (std::ostream& out, const stack<T>& st) -> std::ostream&
@@ -50,37 +53,72 @@ auto stack<T>::length() const noexcept -> size_t
 }
 
 template <typename T>
-auto stack<T>::push_back(const T& data) -> void
+auto stack<T>::push_back(const T& data) noexcept -> void
 {
     if(count == arr_size) //if stack is full
     {
         arr_size += 5;
-        T* longer_array = new T[arr_size];
 
-        for(auto i = 0; i < count; ++i)
-            longer_array[i] = array[i];
-        
+        T* longer_array = nullptr;
+        try
+        {
+            longer_array = new T[arr_size];
+
+            for (auto i = 0; i < count; ++i)
+                longer_array[i] = array[i];
+        }
+        catch(...)
+        {
+            delete [] longer_array;
+            std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
+            return;
+        }
+
         delete [] array;
         array = longer_array;
         longer_array = nullptr;
     }
-    array[count] = data;
+
+    try
+    {
+        array[count] = data;
+    }
+    catch(...)
+    {
+        std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
+        std::cerr << "probably it happend in the copy c-tor of your template type" << std::endl;
+        return;
+    }
     count++;
 }
 
 template <typename T>
-auto stack<T>::pop() -> T try
+auto stack<T>::top() const noexcept -> T*
+{
+    if(count == 0)
+        return nullptr;
+    return &array[count - 1];
+}
+
+template <typename T>
+auto stack<T>::pop() noexcept -> void try
 {
     if(count == 0)
         throw stack<T>::stack_underflow("stack is empty.");
-    T prev_top = array[count];
     --count;
-    return prev_top;
 }
 catch(stack<T>::stack_underflow& err)
 {
     std::cerr << "stack<T>::pop() threw an exception" << std::endl;
     std::cerr << err.what() << std::endl;
+}
+
+template <typename T>
+auto stack<T>::empty() const noexcept -> bool
+{
+    if(count == 0)
+        return true;
+    return false;
 }
 
 template <typename T>
