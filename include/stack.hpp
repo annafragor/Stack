@@ -21,7 +21,7 @@ public:
     auto top() const noexcept -> const T*;
     auto empty() const noexcept -> bool;
     auto length() const noexcept -> size_t;
-    auto push_back(const T&) noexcept -> void;
+    auto push_back(const T&) /* strong */ -> void;
 
     auto operator == (const stack&) -> bool;
 
@@ -49,13 +49,13 @@ auto stack<T>::length() const noexcept -> size_t
 }
 
 template <typename T>
-auto stack<T>::push_back(const T& data) noexcept -> void
+auto stack<T>::push_back(const T& data) /* strong */ -> void
 {
     bool was_enlarged = false;
     T* longer_array = nullptr;
     T* control_array = array;
 
-    if(count == arr_size) //if stack is full
+    if(count == arr_size)
     {
         arr_size *= 2;
         try
@@ -66,10 +66,11 @@ auto stack<T>::push_back(const T& data) noexcept -> void
         }
         catch(...)
         {
-            delete [] longer_array; arr_size /= 2;
-
+            arr_size /= 2;
             array = control_array;
             control_array = nullptr;
+
+            delete [] longer_array;
 
             std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
             return;
