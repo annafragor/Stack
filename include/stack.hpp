@@ -18,7 +18,7 @@ public:
 	stack();
 	~stack();
 	auto pop() noexcept -> void;
-	auto top() const noexcept -> T*;
+	auto top() const noexcept -> const T*;
 	auto empty() const noexcept -> bool;
 	auto length() const noexcept -> size_t;
 	auto push_back(const T&) noexcept -> void;
@@ -52,20 +52,25 @@ template <typename T>
 auto stack<T>::push_back(const T& data) noexcept -> void
 {
 	bool was_enlarged = false;
-	if(count == arr_size) //if stack is full
-	{		
-	arr_size *= 2;
+    T* longer_array = nullptr;
+    T* control_array = array;
 
-		T* longer_array = nullptr;
+    if(count == arr_size) //if stack is full
+	{
+        arr_size *= 2;
 		try
 		{
 			longer_array = new T[arr_size];
 			std::copy(array, array + count, longer_array);
-			delete [] array;
+            array = nullptr;
 		}
 		catch(...)
 		{
 			delete [] longer_array; arr_size /= 2;
+
+            array = control_array;
+            control_array = nullptr;
+
 			std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
 			return;
 		}
@@ -83,21 +88,28 @@ auto stack<T>::push_back(const T& data) noexcept -> void
 		if(was_enlarged)
 		{
 			arr_size /= 2;
-			T* shorten_array = new T[arr_size];
-			std::copy(array, array + count, shorten_array);
-			delete [] array;
-			array = shorten_array;
-			shorten_array = nullptr;	
+            array = control_array;
+            control_array = nullptr;
 		}	
 		std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
 		std::cerr << "probably it happend in the copy c-tor of your template type" << std::endl;
 		return;
 	}
+
+    if(was_enlarged)
+    {
+        try
+        {
+            delete [] control_array;
+        }
+        catch(...) {}
+    }
+    control_array = nullptr;
 	count++;
 }
 
 template <typename T>
-auto stack<T>::top() const noexcept -> T*
+auto stack<T>::top() const noexcept -> const T*
 {
 	if(count == 0)
 		return nullptr;
