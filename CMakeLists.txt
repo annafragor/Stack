@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 option(BUILD_TESTS "Build tests for moskanka" ON)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include /tests)
-add_library(Stack STATIC ${CMAKE_CURRENT_SOURCE_DIR}/sources/stack.cpp tests/main.cpp)
+add_library(Stack STATIC ${CMAKE_CURRENT_SOURCE_DIR} tests/main.cpp)
 
 add_executable(Examples ${CMAKE_CURRENT_SOURCE_DIR} examples/main.cpp)
 

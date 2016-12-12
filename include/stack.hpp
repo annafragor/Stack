@@ -2,8 +2,32 @@
 // Created by anna on 03.12.16.
 //
 
+/*
+ * Реализовать класс `allocator`, использующий для выделения
+памяти `operator new` и сделать его базовым для класса `stack`.
+
+Интерфейс класса `allocator`:
+
+template <typename T>
+class allocator
+{
+protected:
+   allocator(size_t size = 0);
+   ~allocator();
+   auto swap(allocator& other) -> void;
+   allocator(allocator const&) = delete;
+   auto operator =(allocator const&) -> allocator& = delete;
+
+   T * ptr_;
+   size_t size_;
+   size_t count_;
+};
+ */
+
 #ifndef STACK_STACK_H
 #define STACK_STACK_H
+
+#include "allocator.hpp"
 
 #include <iostream>
 #include <exception>
@@ -12,11 +36,11 @@
 #include <iterator>
 
 template <typename T>
-class stack
+class stack : public allocator<T>
 {
 public:
     stack();
-    ~stack();
+    ~stack() {}
     auto pop() noexcept -> void;
     auto top() const noexcept -> const T*;
     auto empty() const noexcept -> bool;
@@ -32,97 +56,65 @@ public:
         out << "\n";
         return out;
     }
-
-private:
-    size_t count;
-    size_t arr_size;
-    T* array;
 };
 
 template <typename T>
-stack<T>::stack() : count(0), arr_size(1), array(new T[arr_size]) {}
+stack<T>::stack() : allocator<T>(1) {}
 
 template <typename T>
 auto stack<T>::length() const noexcept -> size_t
 {
-    return count;
+    return allocator<T>::count;
 }
 
 template <typename T>
 auto stack<T>::push_back(const T& data) /* strong */ -> void
 {
     bool was_enlarged = false;
-    T* longer_array = nullptr;
-    T* control_array = array;
-
-    if(count == arr_size)
+    if(allocator<T>::count == allocator<T>::arr_size)
     {
-        arr_size *= 2;
         try
         {
-            longer_array = new T[arr_size];
-            std::copy(array, array + count, longer_array);
-            array = nullptr;
+            allocator<T>::allocate();
         }
-        catch(...)
-        {
-            arr_size /= 2;
-            array = control_array;
-            control_array = nullptr;
-
-            delete [] longer_array;
-
-            std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
-            return;
-        }
-        array = longer_array;
+        catch(...) { return; }
         was_enlarged = true;
-        longer_array = nullptr;
     }
 
     try
     {
-        array[count] = data;
+        allocator<T>::array[allocator<T>::count] = data;
     }
     catch(...)
     {
         if(was_enlarged)
         {
-            arr_size /= 2;
-            array = control_array;
-            control_array = nullptr;
+            allocator<T>::arr_size /= 2;
+            allocator<T> shorten(allocator<T>::arr_size);
+            std::copy(allocator<T>::array, allocator<T>::array + allocator<T>::count, shorten.array);
+            allocator<T>::swap(shorten);
         }    
         std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
         std::cerr << "probably it happend in the copy c-tor of your template type" << std::endl;
         return;
     }
-
-    if(was_enlarged)
-    {
-        try
-        {
-            delete [] control_array;
-        }
-        catch(...) {}
-    }
-    control_array = nullptr;
-    count++;
+    allocator<T>::count++;
 }
 
 template <typename T>
 auto stack<T>::top() const noexcept -> const T*
 {
-    if(count == 0)
+    if(allocator<T>::count == 0)
         return nullptr;
-    return &array[count - 1];
+    return &allocator<T>::array[allocator<T>::count - 1];
 }
 
 template <typename T>
 auto stack<T>::pop() noexcept -> void try
 {
-    if(count == 0)
+    if(allocator<T>::count == 0)
         throw std::underflow_error("stack is empty.");
-    --count;
+    --allocator<T>::count;
 }
 catch(std::underflow_error& err)
 {
@@ -133,24 +125,18 @@ catch(std::underflow_error& err)
 template <typename T>
 auto stack<T>::empty() const noexcept -> bool
 {
-    if(count == 0)
+    if(allocator<T>::count == 0)
         return true;
     return false;
 }
 
 template <typename T>
-stack<T>::~stack()
-{
-    delete [] array;
-}
-
-template <typename T>
 auto stack<T>::operator == (const stack<T>& rhs) -> bool
 {
-    if(count != rhs.count)
+    if(allocator<T>::count != rhs.allocator<T>::count)
         return false;
-    for(size_t i = 0; i < count; ++i)
-        if(array[i] != rhs.array[i])
+    for(size_t i = 0; i < allocator<T>::count; ++i)
+        if(allocator<T>::array[i] != rhs.allocator<T>::array[i])
             return false;
     return true;
 }
