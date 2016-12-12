@@ -2,29 +2,6 @@
 // Created by anna on 03.12.16.
 //
 
-
-/*
-Реализовать класс `allocator`, использующий для выделения
-памяти `operator new` и сделать его базовым для класса `stack`.
-
-            Интерфейс класса `allocator`:
-template <typename T>
-class allocator
-{
-protected:
-   allocator(size_t size = 0);
-   ~allocator();
-   auto swap(allocator& other) -> void;
-   allocator(allocator const&) = delete;
-   auto operator =(allocator const&) -> allocator& = delete;
-
-   T * ptr_;
-   size_t size_;
-   size_t count_;
-};
-*/
-
-
 #ifndef STACK_STACK_H
 #define STACK_STACK_H
 
