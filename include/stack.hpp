@@ -41,7 +41,7 @@ public:
     stack();
     ~stack();
     auto pop() noexcept -> void;
-    auto top() const noexcept -> const T*;
+    auto top() const /* strong */ -> T;
     auto empty() const noexcept -> bool;
     auto length() const noexcept -> size_t;
     auto push_back(const T&) /* strong */ -> void;
@@ -50,7 +50,6 @@ public:
 
     friend auto operator << (std::ostream& out, const stack<T>& st) -> std::ostream&
     {
-
         std::copy(st.array, st.array + st.count, std::ostream_iterator<T>(out, " "));
         out << "\n";
         return out;
@@ -134,11 +133,22 @@ auto stack<T>::push_back(const T& data) /* strong */ -> void
 }
 
 template <typename T>
-auto stack<T>::top() const noexcept -> const T*
+auto stack<T>::top() const /* strong */ -> T try
 {
     if(count == 0)
-        return nullptr;
-    return &array[count - 1];
+        throw std::underflow_error("stack is empty.");
+    return array[count - 1];
+}
+catch(std::underflow_error& err)
+{
+    std::cerr << "stack<T>::top() threw an exception" << std::endl;
+    std::cerr << err.what() << std::endl;
+    throw;
+}
+catch(...)
+{
+    std::cerr << "stack<T>::top() threw an exception" << std::endl;
+    throw;
 }
 
 template <typename T>
