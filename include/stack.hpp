@@ -2,47 +2,21 @@
 // Created by anna on 03.12.16.
 //
 
-/*
- * Реализовать класс `allocator`, использующий для выделения
-памяти `operator new` и сделать его базовым для класса `stack`.
-
-Интерфейс класса `allocator`:
-
-template <typename T>
-class allocator
-{
-protected:
-   allocator(size_t size = 0);
-   ~allocator();
-   auto swap(allocator& other) -> void;
-   allocator(allocator const&) = delete;
-   auto operator =(allocator const&) -> allocator& = delete;
-
-   T * ptr_;
-   size_t size_;
-   size_t count_;
-};
- */
-
 #ifndef STACK_STACK_H
 #define STACK_STACK_H
 
-#include "allocator.hpp"
-
-#include <iostream>
+#include <allocator.hpp>
 #include <exception>
-#include <cstring>
-#include <algorithm>
+//#include <cstring>
 #include <iterator>
 
 template <typename T>
-class stack : public allocator<T>
+class stack : protected allocator<T>
 {
 public:
     stack();
-    ~stack() {}
     auto pop() noexcept -> void;
-    auto top() const noexcept -> const T*;
+    auto top() const /* strong */ -> T;
     auto empty() const noexcept -> bool;
     auto length() const noexcept -> size_t;
     auto push_back(const T&) /* strong */ -> void;
@@ -51,8 +25,9 @@ public:
 
     friend auto operator << (std::ostream& out, const stack<T>& st) -> std::ostream&
     {
-
-        std::copy(st.array, st.array + st.count, std::ostream_iterator<T>(out, " "));
+        std::copy(st.allocator<T>::array,
+                  st.allocator<T>::array + st.allocator<T>::count,
+                  std::ostream_iterator<T>(out, " "));
         out << "\n";
         return out;
     }
@@ -102,11 +77,22 @@ auto stack<T>::push_back(const T& data) /* strong */ -> void
 }
 
 template <typename T>
-auto stack<T>::top() const noexcept -> const T*
+auto stack<T>::top() const /* strong */ -> T try
 {
     if(allocator<T>::count == 0)
-        return nullptr;
-    return &allocator<T>::array[allocator<T>::count - 1];
+        throw std::underflow_error("stack is empty.");
+    return allocator<T>::array[allocator<T>::count - 1];
+}
+catch(std::underflow_error& err)
+{
+    std::cerr << "stack<T>::top() threw an exception" << std::endl;
+    std::cerr << err.what() << std::endl;
+    throw;
+}
+catch(...)
+{
+    std::cerr << "stack<T>::top() threw an exception" << std::endl;
+    throw;
 }
 
 template <typename T>
@@ -125,9 +111,7 @@ catch(std::underflow_error& err)
 template <typename T>
 auto stack<T>::empty() const noexcept -> bool
 {
-    if(allocator<T>::count == 0)
-        return true;
-    return false;
+    return allocator<T>::count ? false : true;
 }
 
 template <typename T>

@@ -17,6 +17,9 @@ target_link_libraries(length ${PROJECT_NAME} ${DEPENDS_LIBRARIES})
 add_executable(pop ${CMAKE_CURRENT_SOURCE_DIR}/tests/pop.cpp)
 target_link_libraries(pop ${PROJECT_NAME} ${DEPENDS_LIBRARIES})
 
+add_executable(top ${CMAKE_CURRENT_SOURCE_DIR}/tests/top.cpp)
+target_link_libraries(top ${PROJECT_NAME} ${DEPENDS_LIBRARIES})
+
 add_executable(push_back ${CMAKE_CURRENT_SOURCE_DIR}/tests/push_back.cpp)
 target_link_libraries(push_back ${PROJECT_NAME} ${DEPENDS_LIBRARIES})
 

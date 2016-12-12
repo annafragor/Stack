@@ -29,7 +29,7 @@ SCENARIO("if stack isn't empty AND isn't full => length must increase")
         WHEN("try to push new element")
         {
             st.push_back(2);
-            THEN("length must be equal to 1")
+            THEN("length must be equal to 2")
             {
                 REQUIRE(st.length() == 2);
             }

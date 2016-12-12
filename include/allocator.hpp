@@ -4,56 +4,54 @@
 
 #ifndef STACK_ALLOCATOR_HPP
 #define STACK_ALLOCATOR_HPP
-#pragma once
 
 #include <iostream>
+#include <algorithm>
 
 template <typename T>
 class allocator
 {
 public:
-    allocator(size_t size_i = 0);
-    ~allocator();
-
-    auto allocate() -> T*;
-    auto swap(allocator&) noexcept -> void;
-
-    allocator(const allocator&) = delete;
-    auto operator =(const allocator&) -> allocator& = delete;
-
-protected:
     size_t count;
     size_t arr_size;
     T* array;
+
+//public:
+    allocator(size_t size_i = 0);
+    allocator(const allocator&) = delete;
+    ~allocator();
+
+    auto allocate() -> void;
+    auto swap(allocator&) noexcept -> void;
+    auto operator =(const allocator&) -> allocator& = delete;
 };
 
 template <typename T>
-allocator<T>::allocator(size_t size_i) : count(0), arr_size(size_i), array(new T[arr_size]) {}
+allocator<T>::allocator(size_t size_i)
+{
+    count = 0;
+    arr_size = size_i;
+    array = static_cast<T*>(::operator new(arr_size * sizeof(T)));
+}
 
 template <typename T>
 allocator<T>::~allocator()
 {
-    delete [] array;
+    for(size_t i = 0; i < count; i++)
+        array[i].~T();
+    ::operator delete[](array);
 }
 
 template <typename T>
 auto allocator<T>::swap(allocator& rhs) noexcept -> void
 {
-    T* tmp_arr = array;
-    array = rhs.array;
-    rhs.array = tmp_arr;
-
-    size_t tmp_count = count;
-    count = rhs.count;
-    rhs.count = tmp_count;
-
-    size_t tmp_size = arr_size;
-    arr_size = rhs.arr_size;
-    rhs.arr_size = tmp_size;
+    std::swap(array, rhs.array);
+    std::swap(count, rhs.count);
+    std::swap(arr_size, rhs.arr_size);
 }
 
 template <typename T>
-auto allocator<T>::allocate() -> T*
+auto allocator<T>::allocate() -> void
 {
     T* control_array = array;
     size_t control_count = count;
@@ -63,6 +61,7 @@ auto allocator<T>::allocate() -> T*
     {
         allocator<T> longer(arr_size);
         std::copy(array, array + count, longer.array);
+        longer.count = count;
         swap(longer);
     }
     catch(...)
