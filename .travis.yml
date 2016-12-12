@@ -19,3 +19,5 @@ script:
   - ./length -s -r compact
   - ./pop -s -r compact
   - ./push_back -s -r compact
+  - ./top -s -r compact
+  - ./empty -s -r compact

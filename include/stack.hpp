@@ -11,7 +11,7 @@
 #include <iterator>
 
 template <typename T>
-class stack : protected allocator<T>
+class stack : private allocator<T>
 {
 public:
     stack();
