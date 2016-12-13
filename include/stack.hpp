@@ -52,7 +52,7 @@ auto stack<T>::push_back(const T& data) /* strong */ -> void
         {
             allocator<T>::allocate();
         }
-        catch(...) { return; }
+        catch(...) { throw; }
         was_enlarged = true;
     }
 
@@ -71,7 +71,7 @@ auto stack<T>::push_back(const T& data) /* strong */ -> void
         }    
         std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
         std::cerr << "probably it happend in the copy c-tor of your template type" << std::endl;
-        return;
+        throw;
     }
     allocator<T>::count++;
 }
