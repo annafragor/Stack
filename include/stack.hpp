@@ -7,7 +7,6 @@
 
 #include <allocator.hpp>
 #include <exception>
-//#include <cstring>
 #include <iterator>
 
 template <typename T>
@@ -63,12 +62,7 @@ auto stack<T>::push_back(const T& data) /* strong */ -> void
     catch(...)
     {
         if(was_enlarged)
-        {
-            allocator<T>::arr_size /= 2;
-            allocator<T> shorten(allocator<T>::arr_size);
-            std::copy(allocator<T>::array, allocator<T>::array + allocator<T>::count, shorten.array);
-            allocator<T>::swap(shorten);
-        }    
+            allocator<T>::deallocate();
         std::cerr << "stack<T>::push_back(" << data << ") threw an exception!" << std::endl;
         std::cerr << "probably it happend in the copy c-tor of your template type" << std::endl;
         throw;

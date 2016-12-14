@@ -11,17 +11,17 @@
 template <typename T>
 class allocator
 {
-public:
+protected:
     size_t count;
     size_t arr_size;
     T* array;
 
-//public:
     allocator(size_t size_i = 0);
     allocator(const allocator&) = delete;
     ~allocator();
 
     auto allocate() -> void;
+    auto deallocate() -> void;
     auto swap(allocator&) noexcept -> void;
     auto operator =(const allocator&) -> allocator& = delete;
 };
@@ -72,6 +72,15 @@ auto allocator<T>::allocate() -> void
         std::cerr << "an error happend when memory allocation" << std::endl;
         throw;
     }
+}
+
+template <typename T>
+auto allocator<T>::deallocate() -> void
+{
+    arr_size /= 2;
+    allocator<T> shorten(arr_size);
+    std::copy(array, array + count, shorten.array);
+    swap(shorten);
 }
 
 #endif //STACK_ALLOCATOR_HPP
